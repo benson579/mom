@@ -8,11 +8,12 @@
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
-        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f0f2f5; }
-        /* 改用適合旅遊的藍綠色漸層 */
+        /* 背景色改為清爽的灰白色，字體顏色深藍 */
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f0f2f5; color: #2c3e50; }
+        /* 品牌色：海軍藍漸層 */
         .brand-bg { background: linear-gradient(135deg, #2c3e50 0%, #3498DB 100%); }
     </style>
-    <!-- 全域錯誤攔截器 (保留 Benson 版的除錯功能) -->
+    <!-- 全域錯誤攔截器 (Benson 架構核心：發生錯誤時會顯示在畫面上，方便除錯) -->
     <script>
         window.onerror = function(message, source, lineno, colno, error) {
             const errorDiv = document.getElementById('debugInfo');
@@ -30,43 +31,43 @@
         };
     </script>
 </head>
-<body class="min-h-screen flex items-center justify-center p-6 text-center text-[#2c3e50]">
+<body class="min-h-screen flex items-center justify-center p-6 text-center">
 
     <div class="max-w-xs w-full">
-        <!-- 1. 狀態顯示 -->
+        <!-- 1. 狀態顯示 (Loading) -->
         <div id="statusUI">
             <div class="w-12 h-12 border-4 border-[#3498DB] border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-            <h1 class="text-xl font-bold mb-2 tracking-wide text-[#2c3e50]">名片準備中</h1>
+            <h1 class="text-xl font-bold mb-2 tracking-wide">名片準備中</h1>
             <p id="statusDesc" class="text-gray-500 text-sm">正在喚醒阿虹的名片...</p>
         </div>
 
-        <!-- 2. 手動發送按鈕 (當自動發送被取消或失敗時顯示) -->
+        <!-- 2. 手動發送按鈕 (Benson 架構核心：當自動發送被取消或失敗時顯示) -->
         <div id="manualUI" class="hidden">
-            <div class="w-16 h-16 brand-bg rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-2xl">
-                <i class="fas fa-paper-plane text-white text-2xl"></i>
+            <div class="w-16 h-16 brand-bg rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-2xl text-white">
+                <i class="fas fa-paper-plane text-2xl"></i>
             </div>
             <h1 class="text-xl font-bold mb-2">名片已就緒</h1>
             <p class="text-gray-500 text-xs mb-8">點擊下方按鈕，選擇好友分享名片</p>
-            <button onclick="sendAhongCard()" class="w-full py-4 brand-bg text-white rounded-2xl font-bold text-lg active:scale-95 transition-all shadow-lg hover:shadow-blue-900/20">
+            <button onclick="sendAhongCard()" class="w-full py-4 brand-bg text-white rounded-2xl font-black text-lg active:scale-95 transition-all shadow-lg hover:shadow-blue-900/20">
                 發送名片
             </button>
         </div>
 
-        <!-- 3. 錯誤 UI -->
+        <!-- 3. 錯誤 UI (Benson 架構核心：顯示錯誤訊息) -->
         <div id="errorUI" class="hidden">
             <div class="bg-red-500/10 border border-red-500/50 p-6 rounded-3xl text-left">
                 <h1 class="text-red-500 font-bold mb-2 text-center">發生錯誤</h1>
                 <p id="errorDetail" class="text-gray-600 text-xs break-all font-mono mb-4"></p>
                 <div id="envInfo" class="text-[10px] text-gray-400 border-t border-gray-300 pt-2 font-mono"></div>
-                <button onclick="window.location.reload()" class="w-full mt-4 py-2 bg-gray-200 rounded text-xs uppercase hover:bg-gray-300">重新載入</button>
+                <button onclick="window.location.reload()" class="w-full mt-4 py-2 bg-gray-200 rounded text-xs uppercase hover:bg-gray-300 font-bold text-gray-600">重新載入</button>
             </div>
         </div>
         
+        <!-- 除錯資訊懸浮窗 -->
         <div id="debugInfo" style="display:none; position:fixed; bottom:0; left:0; width:100%; background:rgba(0,0,0,0.9); color:red; font-size:10px; padding:10px; text-align:left; z-index:9999;"></div>
     </div>
 
     <script>
-        // 設定區
         const MY_LIFF_ID = "2008788337-c00C9UGS"; 
         
         // 分享連結 (回流到這個發射器)
@@ -270,22 +271,25 @@
           }
         };
 
+        // UI 切換控制 (Benson 架構)
         function showUI(id, msg = "") {
             document.getElementById('statusUI').classList.add('hidden');
             document.getElementById('manualUI').classList.add('hidden');
             document.getElementById('errorUI').classList.add('hidden');
+            
             if(id === 'errorUI') {
                 document.getElementById('errorDetail').innerText = msg;
                 let env = "Env: ";
                 try { env += liff.getOS() + " / " + liff.getLanguage() + " / " + liff.getVersion(); } catch(e){}
                 document.getElementById('envInfo').innerText = env;
             }
+            
             document.getElementById(id).classList.remove('hidden');
         }
 
+        // 發送名片邏輯
         async function sendAhongCard() {
             try {
-                // 嘗試開啟分享選單
                 const res = await liff.shareTargetPicker([
                     {
                         "type": "flex",
@@ -295,39 +299,32 @@
                 ]);
                 
                 if (res) { 
-                    // 分享成功，關閉視窗
                     liff.closeWindow(); 
                 } else { 
-                    // 使用者取消分享或失敗，顯示手動按鈕
+                    // 如果取消分享，顯示手動按鈕讓使用者可以再按一次
                     showUI('manualUI'); 
                 }
             } catch (err) {
                 console.error(err);
                 const code = err.code || "Unknown";
                 const message = err.message || JSON.stringify(err);
-                // 顯示詳細錯誤資訊
                 showUI('errorUI', `[${code}] ${message}`);
             }
         }
 
+        // 主程式：初始化 -> 登入 -> 發送
         async function main() {
             try {
-                // 初始化 LIFF
                 await liff.init({ liffId: MY_LIFF_ID });
-                
                 if (!liff.isLoggedIn()) {
-                    // 沒登入就登入
                     liff.login();
                 } else {
-                    // 已登入，直接執行發送
                     sendAhongCard();
                 }
             } catch (err) {
                 showUI('errorUI', "LIFF Init Error: " + err.message);
             }
         }
-        
-        // 頁面載入後執行
         window.onload = main;
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
