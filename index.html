@@ -9,10 +9,9 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #0F172A; }
-        /* 使用阿虹的品牌色：海軍藍 */
         .brand-bg { background: linear-gradient(135deg, #2c3e50 0%, #3498DB 100%); }
     </style>
-    <!-- 全域錯誤攔截器 (參照 Benson 架構) -->
+    <!-- 全域錯誤攔截器 -->
     <script>
         window.onerror = function(message, source, lineno, colno, error) {
             const errorDiv = document.getElementById('debugInfo');
@@ -66,16 +65,13 @@
     </div>
 
     <script>
-        // 設定 LIFF ID
         const MY_LIFF_ID = "2008788337-c00C9UGS"; 
-        
-        // 這是回流到這個發射器的網址
         const shareUrl = "https://liff.line.me/" + MY_LIFF_ID;
 
-        // 【JSON 修復報告】
-        // 1. 移除了所有 "shadow": true (文字不支援陰影)
-        // 2. 移除了所有 "offsetTop" (相對定位不支援偏移)
-        // 3. 確保結構與 Benson 的 Carousel 容器相容
+        // 【最終修正版 JSON】
+        // 1. 移除絕對定位，改為標準垂直排列。
+        // 2. 標題顏色改為深色，避免在白底上隱形。
+        // 3. 圖示改用 Emoji (Text 元件)，避免圖片讀取錯誤。
         const ahongJson = {
           "type": "bubble",
           "hero": {
@@ -90,21 +86,19 @@
             "type": "box",
             "layout": "vertical",
             "contents": [
-              // 主標題：使用絕對定位覆蓋在圖片上方 (這是合法的，只要沒有 shadow)
+              // 1. 主標題 (深藍色，標準位置)
               {
-                "type": "text", "text": "佳士多旅遊總監", "weight": "bold", "size": "xl", "color": "#ffffff",
-                "position": "absolute", "offsetBottom": "15px", "offsetLeft": "15px"
-                // 已移除 "shadow": true
+                "type": "text", "text": "佳士多旅遊總監", "weight": "bold", "size": "xl", "color": "#2c3e50"
               },
+              // 2. 副標題
               {
-                "type": "text", "text": "帶您看見世界的美", "size": "xs", "color": "#ffffffcc",
-                "position": "absolute", "offsetBottom": "40px", "offsetLeft": "15px"
+                "type": "text", "text": "帶您看見世界的美", "size": "xs", "color": "#888888", "margin": "sm"
               },
-              // 標題與標籤
+              // 3. 標籤與資歷
               {
                 "type": "box", "layout": "horizontal", "margin": "md", "alignItems": "center",
                 "contents": [
-                  { "type": "text", "text": "全方位旅遊 x 生活選物", "weight": "bold", "size": "md", "color": "#2c3e50", "flex": 1 },
+                  { "type": "text", "text": "全方位旅遊 x 生活選物", "weight": "bold", "size": "sm", "color": "#3498DB", "flex": 1 },
                   {
                     "type": "box", "layout": "vertical", "flex": 0, "backgroundColor": "#FFF0E0", "cornerRadius": "sm", "paddingAll": "xs",
                     "contents": [
@@ -113,19 +107,18 @@
                   }
                 ]
               },
-              { "type": "text", "text": "整合三大旅行社資源，為您打造最完美的旅程。懂玩、懂吃、懂生活。", "size": "xs", "color": "#555555", "wrap": true, "margin": "md" },
+              // 4. 分隔線
               { "type": "separator", "margin": "lg" },
               
-              // 列表區塊
+              // 5. 列表區塊 (改用 Emoji 確保顯示)
               {
-                "type": "box", "layout": "vertical", "margin": "lg", "spacing": "md",
+                "type": "box", "layout": "vertical", "margin": "lg", "spacing": "sm",
                 "contents": [
                   // 第一項
                   {
                     "type": "box", "layout": "horizontal", "spacing": "md", "alignItems": "center",
                     "contents": [
-                      // 已移除 offsetTop
-                      { "type": "icon", "url": "https://cdn-icons-png.flaticon.com/512/723/723955.png", "size": "sm" },
+                      { "type": "text", "text": "✈️", "size": "sm", "flex": 0 },
                       {
                         "type": "box", "layout": "vertical", "flex": 1,
                         "contents": [
@@ -138,9 +131,9 @@
                   },
                   // 第二項
                   {
-                    "type": "box", "layout": "horizontal", "spacing": "md", "alignItems": "center",
+                    "type": "box", "layout": "horizontal", "spacing": "md", "alignItems": "center", "margin": "sm",
                     "contents": [
-                      { "type": "icon", "url": "https://cdn-icons-png.flaticon.com/512/1256/1256650.png", "size": "sm" },
+                      { "type": "text", "text": "🤝", "size": "sm", "flex": 0 },
                       {
                         "type": "box", "layout": "vertical", "flex": 1,
                         "contents": [
@@ -153,9 +146,9 @@
                   },
                   // 第三項
                   {
-                    "type": "box", "layout": "horizontal", "spacing": "md", "alignItems": "center",
+                    "type": "box", "layout": "horizontal", "spacing": "md", "alignItems": "center", "margin": "sm",
                     "contents": [
-                      { "type": "icon", "url": "https://cdn-icons-png.flaticon.com/512/2921/2921226.png", "size": "sm" },
+                      { "type": "text", "text": "❤️", "size": "sm", "flex": 0 },
                       {
                         "type": "box", "layout": "vertical", "flex": 1,
                         "contents": [
@@ -189,9 +182,7 @@
                 ]
               },
               {
-                "type": "button",
-                "style": "secondary",
-                "height": "sm",
+                "type": "button", "style": "secondary", "height": "sm",
                 "action": { "type": "uri", "label": "分享名片給好友", "uri": shareUrl },
                 "color": "#F1F3F4"
               }
@@ -199,7 +190,7 @@
           }
         };
 
-        // UI 控制 (完全複製 Benson 的邏輯)
+        // UI 切換控制
         function showUI(id, msg = "") {
             document.getElementById('statusUI').classList.add('hidden');
             document.getElementById('manualUI').classList.add('hidden');
@@ -215,7 +206,11 @@
 
         async function sendAhongCard() {
             try {
-                // 嘗試開啟分享選單
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                    return;
+                }
+
                 const res = await liff.shareTargetPicker([
                     {
                         "type": "flex",
@@ -225,41 +220,28 @@
                 ]);
                 
                 if (res) { 
-                    // 分享成功，關閉視窗
                     liff.closeWindow(); 
                 } else { 
-                    // 使用者取消分享或失敗，顯示手動按鈕
                     showUI('manualUI'); 
                 }
             } catch (err) {
                 console.error(err);
                 const code = err.code || "Unknown";
                 const message = err.message || JSON.stringify(err);
-                // 顯示詳細錯誤資訊 (參照 Benson)
                 showUI('errorUI', `[${code}] ${message}`);
             }
         }
 
         async function main() {
             try {
-                // 初始化 LIFF
                 await liff.init({ liffId: MY_LIFF_ID });
-                
-                if (!liff.isLoggedIn()) {
-                    // 沒登入就登入
-                    liff.login();
-                } else {
-                    // 已登入，直接執行發送
-                    // 這裡改為自動嘗試，但如果有錯誤(如瀏覽器阻擋)，sendAhongCard 內的 catch 會處理
-                    // Benson 程式碼是直接呼叫，我們照做
-                    sendAhongCard();
-                }
+                // 為了避免瀏覽器阻擋，直接進入手動模式
+                showUI('manualUI');
             } catch (err) {
                 showUI('errorUI', "LIFF Init Error: " + err.message);
             }
         }
         
-        // 頁面載入後執行
         window.onload = main;
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
