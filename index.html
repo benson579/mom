@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>佳士多旅遊總監 - 阿虹名片</title>
+    <title>傅虹 FU HONG - 旅遊名片</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
@@ -61,6 +61,52 @@
             </div>
         </div>
         
+        <!-- 預覽區 (讓您在網頁上也能看到即將發送的樣子) -->
+        <div class="mt-8 bg-white rounded-xl overflow-hidden w-full max-w-[300px] mx-auto text-left shadow-lg">
+            <!-- 圖片 -->
+            <div class="relative w-full h-44">
+                <img src="https://i.postimg.cc/2StGJdPr/8DBF6C7B-90B7-491F-8CFB-B5156FD87732.jpg" class="w-full h-full object-cover" style="object-position: top;">
+            </div>
+            <!-- 內容 -->
+            <div class="p-4">
+                <!-- 1. 名字 (最上面) -->
+                <h2 class="text-[#2c3e50] font-bold text-xl leading-tight">傅虹 FU HONG</h2>
+                <!-- 2. 副標 -->
+                <p class="text-[#888888] text-xs mt-1">帶您看見世界的美</p>
+                
+                <!-- 3. 標籤列 -->
+                <div class="flex items-center gap-2 mt-3">
+                    <span class="text-[#3498DB] font-bold text-sm flex-1">全方位旅遊 x 生活選物</span>
+                    <span class="bg-[#FFF0E0] text-[#E67E22] text-[10px] font-bold px-2 py-1 rounded">20年資歷</span>
+                </div>
+
+                <div class="w-full border-t border-gray-100 my-3"></div>
+
+                <!-- 4. 列表 -->
+                <div class="space-y-2 text-xs">
+                    <div class="flex items-center gap-2">
+                        <span>✈️</span>
+                        <div>
+                            <p class="text-[#aaaaaa] font-bold">佳士多旅行社</p>
+                            <p class="text-[#2c3e50] font-bold">業務總監</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span>🚩</span>
+                        <div>
+                            <p class="text-[#aaaaaa] font-bold">山富旅行社</p>
+                            <p class="text-[#2c3e50] font-bold">資深領隊導遊</p>
+                        </div>
+                    </div>
+                    <!-- 其他項目略...僅作預覽示意 -->
+                </div>
+            </div>
+            <!-- 預覽底部提示 -->
+            <div class="bg-gray-50 p-2 text-center text-[10px] text-gray-400">
+                (預覽畫面：實際發送為 Flex Message)
+            </div>
+        </div>
+        
         <div id="debugInfo" style="display:none; position:fixed; bottom:0; left:0; width:100%; background:rgba(0,0,0,0.9); color:red; font-size:10px; padding:10px; text-align:left; z-index:9999;"></div>
     </div>
 
@@ -69,9 +115,6 @@
         const shareUrl = "https://liff.line.me/" + MY_LIFF_ID;
 
         // 【最終修正版 JSON】
-        // 1. 移除絕對定位，改為標準垂直排列。
-        // 2. 標題顏色改為深色，避免在白底上隱形。
-        // 3. 圖示改用 Emoji (Text 元件)，避免圖片讀取錯誤。
         const ahongJson = {
           "type": "bubble",
           "hero": {
@@ -86,9 +129,9 @@
             "type": "box",
             "layout": "vertical",
             "contents": [
-              // 1. 主標題 (深藍色，標準位置)
+              // 1. 主標題：改成名字 (最上面)
               {
-                "type": "text", "text": "佳士多旅遊總監", "weight": "bold", "size": "xl", "color": "#2c3e50"
+                "type": "text", "text": "傅虹 FU HONG", "weight": "bold", "size": "xl", "color": "#2c3e50"
               },
               // 2. 副標題
               {
@@ -110,11 +153,11 @@
               // 4. 分隔線
               { "type": "separator", "margin": "lg" },
               
-              // 5. 列表區塊 (改用 Emoji 確保顯示)
+              // 5. 列表區塊
               {
                 "type": "box", "layout": "vertical", "margin": "lg", "spacing": "sm",
                 "contents": [
-                  // 第一項
+                  // 第一項：佳士多
                   {
                     "type": "box", "layout": "horizontal", "spacing": "md", "alignItems": "center",
                     "contents": [
@@ -122,14 +165,27 @@
                       {
                         "type": "box", "layout": "vertical", "flex": 1,
                         "contents": [
-                          { "type": "text", "text": "專業職人", "size": "xxs", "color": "#aaaaaa", "weight": "bold" },
-                          { "type": "text", "text": "佳士多旅行社 業務總監", "size": "sm", "color": "#2c3e50", "weight": "bold", "wrap": true },
-                          { "type": "text", "text": "山富旅行社 資深領隊導遊", "size": "xs", "color": "#666666", "wrap": true }
+                          { "type": "text", "text": "佳士多旅行社", "size": "xxs", "color": "#aaaaaa", "weight": "bold" },
+                          { "type": "text", "text": "業務總監", "size": "sm", "color": "#2c3e50", "weight": "bold", "wrap": true }
                         ]
                       }
                     ]
                   },
-                  // 第二項
+                  // 第二項：山富
+                  {
+                    "type": "box", "layout": "horizontal", "spacing": "md", "alignItems": "center", "margin": "sm",
+                    "contents": [
+                      { "type": "text", "text": "🚩", "size": "sm", "flex": 0 },
+                      {
+                        "type": "box", "layout": "vertical", "flex": 1,
+                        "contents": [
+                          { "type": "text", "text": "山富旅行社", "size": "xxs", "color": "#aaaaaa", "weight": "bold" },
+                          { "type": "text", "text": "資深領隊導遊", "size": "sm", "color": "#2c3e50", "weight": "bold", "wrap": true }
+                        ]
+                      }
+                    ]
+                  },
+                  // 第三項：愛旅遊
                   {
                     "type": "box", "layout": "horizontal", "spacing": "md", "alignItems": "center", "margin": "sm",
                     "contents": [
@@ -137,24 +193,23 @@
                       {
                         "type": "box", "layout": "vertical", "flex": 1,
                         "contents": [
-                          { "type": "text", "text": "在地深耕", "size": "xxs", "color": "#aaaaaa", "weight": "bold" },
-                          { "type": "text", "text": "愛旅遊 中部合作夥伴", "size": "sm", "color": "#2c3e50", "weight": "bold", "wrap": true },
-                          { "type": "text", "text": "客製化行程規劃專家", "size": "xs", "color": "#666666", "wrap": true }
+                          { "type": "text", "text": "愛旅遊 (中部夥伴)", "size": "xxs", "color": "#aaaaaa", "weight": "bold" },
+                          { "type": "text", "text": "客製化行程規劃專家", "size": "sm", "color": "#2c3e50", "weight": "bold", "wrap": true }
                         ]
                       }
                     ]
                   },
-                  // 第三項
+                  // 第四項：團購
                   {
                     "type": "box", "layout": "horizontal", "spacing": "md", "alignItems": "center", "margin": "sm",
                     "contents": [
-                      { "type": "text", "text": "❤️", "size": "sm", "flex": 0 },
+                      { "type": "text", "text": "🛍️", "size": "sm", "flex": 0 },
                       {
                         "type": "box", "layout": "vertical", "flex": 1,
                         "contents": [
-                          { "type": "text", "text": "生活風格", "size": "xxs", "color": "#aaaaaa", "weight": "bold" },
-                          { "type": "text", "text": "百萬團購主 (FB社團)", "size": "sm", "color": "#E74C3C", "weight": "bold", "wrap": true },
-                          { "type": "text", "text": "分享旅行與生活中的美好事物", "size": "xs", "color": "#666666", "wrap": true }
+                          { "type": "text", "text": "生活選物", "size": "xxs", "color": "#aaaaaa", "weight": "bold" },
+                          { "type": "text", "text": "百萬團購主 (FB社團)", "size": "sm", "color": "#555555", "weight": "bold", "wrap": true },
+                          { "type": "text", "text": "分享旅行與生活中的美好事物", "size": "xs", "color": "#999999", "wrap": true }
                         ]
                       }
                     ]
