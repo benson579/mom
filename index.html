@@ -19,7 +19,6 @@
                 errorDiv.style.display = 'block';
                 errorDiv.innerText = "錯誤: " + message;
             }
-            // 不要在這裡直接切換 UI，以免干擾正常的流程控制
             console.error(message, error);
         };
     </script>
@@ -27,14 +26,12 @@
 <body class="min-h-screen flex items-center justify-center p-6 text-center">
 
     <div class="max-w-xs w-full">
-        <!-- 1. 狀態顯示 -->
         <div id="statusUI">
             <div class="w-12 h-12 border-4 border-[#3498DB] border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
             <h1 class="text-xl font-bold mb-2 tracking-wide">名片準備中</h1>
             <p id="statusDesc" class="text-gray-500 text-sm">正在喚醒阿虹的名片...</p>
         </div>
 
-        <!-- 2. 手動發送按鈕 (自動發送失敗時顯示) -->
         <div id="manualUI" class="hidden">
             <div class="w-16 h-16 brand-bg rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-2xl text-white">
                 <i class="fas fa-paper-plane text-2xl"></i>
@@ -46,7 +43,6 @@
             </button>
         </div>
 
-        <!-- 3. 錯誤 UI -->
         <div id="errorUI" class="hidden">
             <div class="bg-red-500/10 border border-red-500/50 p-6 rounded-3xl text-left">
                 <h1 class="text-red-500 font-bold mb-2 text-center">發生錯誤</h1>
@@ -62,8 +58,8 @@
         const MY_LIFF_ID = "2008788337-c00C9UGS"; 
         const shareUrl = "https://liff.line.me/" + MY_LIFF_ID;
 
-        // 【關鍵修正】JSON 結構重構
-        // 將所有 baseline 改為 horizontal + alignItems: center 以確保相容性
+        // 【最終修復】JSON 結構潔淨化
+        // 移除所有 LINE 不支援的屬性 (shadow, offsetTop)，確保 100% 合規
         const ahongJson = {
           "type": "bubble",
           "hero": {
@@ -78,16 +74,16 @@
             "type": "box",
             "layout": "vertical",
             "contents": [
-              // 標題與小標文字 (Absolute Positioning 是安全的)
+              // 標題 (移除了 shadow 屬性)
               {
                 "type": "text", "text": "佳士多旅遊總監", "weight": "bold", "size": "xl", "color": "#ffffff",
-                "position": "absolute", "offsetBottom": "15px", "offsetLeft": "15px", "shadow": true
+                "position": "absolute", "offsetBottom": "15px", "offsetLeft": "15px"
               },
               {
                 "type": "text", "text": "帶您看見世界的美", "size": "xs", "color": "#ffffffcc",
                 "position": "absolute", "offsetBottom": "40px", "offsetLeft": "15px"
               },
-              // 標題區塊：修正 layout 為 horizontal
+              // 標題與標籤
               {
                 "type": "box", "layout": "horizontal", "margin": "md", "alignItems": "center",
                 "contents": [
@@ -103,13 +99,13 @@
               { "type": "text", "text": "整合三大旅行社資源，為您打造最完美的旅程。懂玩、懂吃、懂生活。", "size": "xs", "color": "#555555", "wrap": true, "margin": "md" },
               { "type": "separator", "margin": "lg" },
               
-              // 列表區塊：修正所有項目結構
+              // 列表區塊
               {
                 "type": "box", "layout": "vertical", "margin": "lg", "spacing": "md",
                 "contents": [
-                  // 第一項
+                  // 第一項 (移除了 offsetTop，改用 padding 或 margin 調整)
                   {
-                    "type": "box", "layout": "horizontal", "spacing": "md", "alignItems": "center", // 加入 alignItems: center 確保對齊
+                    "type": "box", "layout": "horizontal", "spacing": "md", "alignItems": "center",
                     "contents": [
                       { "type": "icon", "url": "https://cdn-icons-png.flaticon.com/512/723/723955.png", "size": "sm" },
                       {
@@ -183,16 +179,13 @@
           }
         };
 
-        // UI 切換
         function showUI(id, msg = "") {
             document.getElementById('statusUI').classList.add('hidden');
             document.getElementById('manualUI').classList.add('hidden');
             document.getElementById('errorUI').classList.add('hidden');
-            
             if(id === 'errorUI') {
                 document.getElementById('errorDetail').innerText = msg;
             }
-            
             document.getElementById(id).classList.remove('hidden');
         }
 
@@ -209,13 +202,10 @@
                 if (res) { 
                     liff.closeWindow(); 
                 } else { 
-                    // 取消分享時，顯示手動按鈕
                     showUI('manualUI'); 
                 }
             } catch (err) {
-                console.log(err); // 不印出 error 到 UI，避免驚嚇用戶
-                // 只有當真的是 SUBWINDOW 錯誤（瀏覽器阻擋）時，才切換到手動模式
-                // 其他錯誤 (如 JSON 格式錯) 則可能需要開發者看 console
+                console.log(err); 
                 showUI('manualUI');
             }
         }
@@ -228,15 +218,9 @@
                     liff.login();
                     return;
                 }
-
-                // 【自動發送邏輯】
-                // 這裡我們嘗試自動發送。
-                // 如果是瀏覽器環境，可能會因為 "EXCEPTION_IN_SUBWINDOW" 失敗。
-                // 失敗後，catch 區塊會捕捉到，並呼叫 showUI('manualUI') 顯示按鈕。
                 await sendAhongCard();
 
             } catch (err) {
-                // 初始化失敗
                 showUI('errorUI', "系統初始化錯誤，請重新載入");
             }
         }
