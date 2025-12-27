@@ -41,7 +41,7 @@
             <p id="statusDesc" class="text-gray-500 text-sm">正在喚醒阿虹的名片...</p>
         </div>
 
-        <!-- 2. 手動發送按鈕 (Benson 架構核心：當自動發送被取消或失敗時顯示) -->
+        <!-- 2. 手動發送按鈕 (Benson 架構核心：主要操作區) -->
         <div id="manualUI" class="hidden">
             <div class="w-16 h-16 brand-bg rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-2xl text-white">
                 <i class="fas fa-paper-plane text-2xl"></i>
@@ -290,6 +290,12 @@
         // 發送名片邏輯
         async function sendAhongCard() {
             try {
+                // [修正點] 發送前確保已登入
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                    return; // 登入會跳轉，這裡中斷
+                }
+
                 const res = await liff.shareTargetPicker([
                     {
                         "type": "flex",
@@ -312,15 +318,15 @@
             }
         }
 
-        // 主程式：初始化 -> 登入 -> 發送
+        // 主程式：初始化 -> 顯示按鈕 (不自動發送，避免被瀏覽器阻擋)
         async function main() {
             try {
                 await liff.init({ liffId: MY_LIFF_ID });
-                if (!liff.isLoggedIn()) {
-                    liff.login();
-                } else {
-                    sendAhongCard();
-                }
+                
+                // [修正點] 不管有沒有登入，都顯示手動發送按鈕
+                // 這樣可以避免瀏覽器阻擋自動彈出視窗 (EXCEPTION_IN_SUBWINDOW)
+                showUI('manualUI');
+
             } catch (err) {
                 showUI('errorUI', "LIFF Init Error: " + err.message);
             }
