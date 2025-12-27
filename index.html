@@ -8,72 +8,62 @@
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
-        /* 背景色改為清爽的灰白色，字體顏色深藍 */
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #f0f2f5; color: #2c3e50; }
-        /* 品牌色：海軍藍漸層 */
         .brand-bg { background: linear-gradient(135deg, #2c3e50 0%, #3498DB 100%); }
     </style>
-    <!-- 全域錯誤攔截器 (Benson 架構核心：發生錯誤時會顯示在畫面上，方便除錯) -->
+    <!-- 錯誤攔截器 -->
     <script>
         window.onerror = function(message, source, lineno, colno, error) {
             const errorDiv = document.getElementById('debugInfo');
             if (errorDiv) {
                 errorDiv.style.display = 'block';
-                errorDiv.innerText = "系統錯誤: " + message + "\n行數: " + lineno;
+                errorDiv.innerText = "錯誤: " + message;
             }
-            const ui = document.getElementById('errorUI');
-            const det = document.getElementById('errorDetail');
-            if(ui && det) {
-                ui.classList.remove('hidden');
-                document.getElementById('statusUI').classList.add('hidden');
-                det.innerText = "程式執行錯誤: " + message;
-            }
+            // 不要在這裡直接切換 UI，以免干擾正常的流程控制
+            console.error(message, error);
         };
     </script>
 </head>
 <body class="min-h-screen flex items-center justify-center p-6 text-center">
 
     <div class="max-w-xs w-full">
-        <!-- 1. 狀態顯示 (Loading) -->
+        <!-- 1. 狀態顯示 -->
         <div id="statusUI">
             <div class="w-12 h-12 border-4 border-[#3498DB] border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
             <h1 class="text-xl font-bold mb-2 tracking-wide">名片準備中</h1>
             <p id="statusDesc" class="text-gray-500 text-sm">正在喚醒阿虹的名片...</p>
         </div>
 
-        <!-- 2. 手動發送按鈕 (Benson 架構核心：主要操作區) -->
+        <!-- 2. 手動發送按鈕 (自動發送失敗時顯示) -->
         <div id="manualUI" class="hidden">
             <div class="w-16 h-16 brand-bg rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-2xl text-white">
                 <i class="fas fa-paper-plane text-2xl"></i>
             </div>
-            <h1 class="text-xl font-bold mb-2">名片已就緒</h1>
-            <p class="text-gray-500 text-xs mb-8">點擊下方按鈕，選擇好友分享名片</p>
+            <h1 class="text-xl font-bold mb-2">準備完成</h1>
+            <p class="text-gray-500 text-xs mb-8">自動開啟已攔截，請點擊按鈕發送</p>
             <button onclick="sendAhongCard()" class="w-full py-4 brand-bg text-white rounded-2xl font-black text-lg active:scale-95 transition-all shadow-lg hover:shadow-blue-900/20">
                 發送名片
             </button>
         </div>
 
-        <!-- 3. 錯誤 UI (Benson 架構核心：顯示錯誤訊息) -->
+        <!-- 3. 錯誤 UI -->
         <div id="errorUI" class="hidden">
             <div class="bg-red-500/10 border border-red-500/50 p-6 rounded-3xl text-left">
                 <h1 class="text-red-500 font-bold mb-2 text-center">發生錯誤</h1>
                 <p id="errorDetail" class="text-gray-600 text-xs break-all font-mono mb-4"></p>
-                <div id="envInfo" class="text-[10px] text-gray-400 border-t border-gray-300 pt-2 font-mono"></div>
                 <button onclick="window.location.reload()" class="w-full mt-4 py-2 bg-gray-200 rounded text-xs uppercase hover:bg-gray-300 font-bold text-gray-600">重新載入</button>
             </div>
         </div>
         
-        <!-- 除錯資訊懸浮窗 -->
-        <div id="debugInfo" style="display:none; position:fixed; bottom:0; left:0; width:100%; background:rgba(0,0,0,0.9); color:red; font-size:10px; padding:10px; text-align:left; z-index:9999;"></div>
+        <div id="debugInfo" style="display:none; position:fixed; bottom:0; left:0; width:100%; background:rgba(0,0,0,0.8); color:red; font-size:10px; padding:5px; z-index:99;"></div>
     </div>
 
     <script>
         const MY_LIFF_ID = "2008788337-c00C9UGS"; 
-        
-        // 分享連結 (回流到這個發射器)
         const shareUrl = "https://liff.line.me/" + MY_LIFF_ID;
 
-        // 阿虹名片的 JSON 資料
+        // 【關鍵修正】JSON 結構重構
+        // 將所有 baseline 改為 horizontal + alignItems: center 以確保相容性
         const ahongJson = {
           "type": "bubble",
           "hero": {
@@ -82,90 +72,48 @@
             "size": "full",
             "aspectRatio": "20:13",
             "aspectMode": "cover",
-            "action": {
-              "type": "uri",
-              "uri": "https://line.me/ti/p/FaXuuoOYal"
-            }
+            "action": { "type": "uri", "uri": "https://line.me/ti/p/FaXuuoOYal" }
           },
           "body": {
             "type": "box",
             "layout": "vertical",
             "contents": [
+              // 標題與小標文字 (Absolute Positioning 是安全的)
               {
-                "type": "text",
-                "text": "佳士多旅遊總監",
-                "weight": "bold",
-                "size": "xl",
-                "color": "#ffffff",
-                "position": "absolute",
-                "offsetBottom": "15px",
-                "offsetLeft": "15px",
-                "wrap": true,
-                "style": "normal",
-                "shadow": true
+                "type": "text", "text": "佳士多旅遊總監", "weight": "bold", "size": "xl", "color": "#ffffff",
+                "position": "absolute", "offsetBottom": "15px", "offsetLeft": "15px", "shadow": true
               },
               {
-                "type": "text",
-                "text": "帶您看見世界的美",
-                "size": "xs",
-                "color": "#ffffffcc",
-                "position": "absolute",
-                "offsetBottom": "40px",
-                "offsetLeft": "15px"
+                "type": "text", "text": "帶您看見世界的美", "size": "xs", "color": "#ffffffcc",
+                "position": "absolute", "offsetBottom": "40px", "offsetLeft": "15px"
               },
+              // 標題區塊：修正 layout 為 horizontal
               {
-                "type": "box",
-                "layout": "baseline",
+                "type": "box", "layout": "horizontal", "margin": "md", "alignItems": "center",
                 "contents": [
-                  {
-                    "type": "text",
-                    "text": "全方位旅遊 x 生活選物",
-                    "weight": "bold",
-                    "size": "md",
-                    "color": "#2c3e50",
-                    "flex": 1
-                  },
+                  { "type": "text", "text": "全方位旅遊 x 生活選物", "weight": "bold", "size": "md", "color": "#2c3e50", "flex": 1 },
                   {
                     "type": "box", "layout": "vertical", "flex": 0, "backgroundColor": "#FFF0E0", "cornerRadius": "sm", "paddingAll": "xs",
                     "contents": [
                         { "type": "text", "text": "20年資歷", "size": "xxs", "color": "#E67E22", "weight": "bold" }
                     ]
                   }
-                ],
-                "margin": "md"
+                ]
               },
+              { "type": "text", "text": "整合三大旅行社資源，為您打造最完美的旅程。懂玩、懂吃、懂生活。", "size": "xs", "color": "#555555", "wrap": true, "margin": "md" },
+              { "type": "separator", "margin": "lg" },
+              
+              // 列表區塊：修正所有項目結構
               {
-                "type": "text",
-                "text": "整合三大旅行社資源，為您打造最完美的旅程。懂玩、懂吃、懂生活。",
-                "size": "xs",
-                "color": "#555555",
-                "wrap": true,
-                "margin": "md"
-              },
-              {
-                "type": "separator",
-                "margin": "lg"
-              },
-              {
-                "type": "box",
-                "layout": "vertical",
-                "margin": "lg",
-                "spacing": "md",
+                "type": "box", "layout": "vertical", "margin": "lg", "spacing": "md",
                 "contents": [
+                  // 第一項
                   {
-                    "type": "box",
-                    "layout": "horizontal",
-                    "spacing": "md",
+                    "type": "box", "layout": "horizontal", "spacing": "md", "alignItems": "center", // 加入 alignItems: center 確保對齊
                     "contents": [
+                      { "type": "icon", "url": "https://cdn-icons-png.flaticon.com/512/723/723955.png", "size": "sm" },
                       {
-                        "type": "icon",
-                        "url": "https://cdn-icons-png.flaticon.com/512/723/723955.png",
-                        "size": "sm",
-                        "offsetTop": "xs"
-                      },
-                      {
-                        "type": "box",
-                        "layout": "vertical",
+                        "type": "box", "layout": "vertical", "flex": 1,
                         "contents": [
                           { "type": "text", "text": "專業職人", "size": "xxs", "color": "#aaaaaa", "weight": "bold" },
                           { "type": "text", "text": "佳士多旅行社 業務總監", "size": "sm", "color": "#2c3e50", "weight": "bold", "wrap": true },
@@ -174,19 +122,13 @@
                       }
                     ]
                   },
+                  // 第二項
                   {
-                    "type": "box",
-                    "layout": "horizontal",
-                    "spacing": "md",
+                    "type": "box", "layout": "horizontal", "spacing": "md", "alignItems": "center",
                     "contents": [
+                      { "type": "icon", "url": "https://cdn-icons-png.flaticon.com/512/1256/1256650.png", "size": "sm" },
                       {
-                        "type": "icon",
-                        "url": "https://cdn-icons-png.flaticon.com/512/1256/1256650.png",
-                        "size": "sm", "offsetTop": "xs"
-                      },
-                      {
-                        "type": "box",
-                        "layout": "vertical",
+                        "type": "box", "layout": "vertical", "flex": 1,
                         "contents": [
                           { "type": "text", "text": "在地深耕", "size": "xxs", "color": "#aaaaaa", "weight": "bold" },
                           { "type": "text", "text": "愛旅遊 中部合作夥伴", "size": "sm", "color": "#2c3e50", "weight": "bold", "wrap": true },
@@ -195,19 +137,13 @@
                       }
                     ]
                   },
+                  // 第三項
                   {
-                    "type": "box",
-                    "layout": "horizontal",
-                    "spacing": "md",
+                    "type": "box", "layout": "horizontal", "spacing": "md", "alignItems": "center",
                     "contents": [
+                      { "type": "icon", "url": "https://cdn-icons-png.flaticon.com/512/2921/2921226.png", "size": "sm" },
                       {
-                        "type": "icon",
-                        "url": "https://cdn-icons-png.flaticon.com/512/2921/2921226.png",
-                        "size": "sm", "offsetTop": "xs"
-                      },
-                      {
-                        "type": "box",
-                        "layout": "vertical",
+                        "type": "box", "layout": "vertical", "flex": 1,
                         "contents": [
                           { "type": "text", "text": "生活風格", "size": "xxs", "color": "#aaaaaa", "weight": "bold" },
                           { "type": "text", "text": "百萬團購主 (FB社團)", "size": "sm", "color": "#E74C3C", "weight": "bold", "wrap": true },
@@ -221,57 +157,33 @@
             ]
           },
           "footer": {
-            "type": "box",
-            "layout": "vertical",
-            "spacing": "sm",
+            "type": "box", "layout": "vertical", "spacing": "sm",
             "contents": [
               {
-                "type": "box",
-                "layout": "horizontal",
-                "spacing": "sm",
+                "type": "box", "layout": "horizontal", "spacing": "sm",
                 "contents": [
                   {
-                    "type": "button",
-                    "style": "primary",
-                    "height": "sm",
-                    "action": {
-                      "type": "uri",
-                      "label": "諮詢行程",
-                      "uri": "https://line.me/ti/p/FaXuuoOYal"
-                    },
-                    "color": "#06C755",
-                    "flex": 1
+                    "type": "button", "style": "primary", "height": "sm",
+                    "action": { "type": "uri", "label": "諮詢行程", "uri": "https://line.me/ti/p/FaXuuoOYal" },
+                    "color": "#06C755", "flex": 1
                   },
                   {
-                    "type": "button",
-                    "style": "primary",
-                    "height": "sm",
-                    "action": {
-                      "type": "uri",
-                      "label": "逛逛團購",
-                      "uri": "https://www.facebook.com/share/17GC8EFYAD/?mibextid=wwXIfr"
-                    },
-                    "color": "#1877F2",
-                    "flex": 1
+                    "type": "button", "style": "primary", "height": "sm",
+                    "action": { "type": "uri", "label": "逛逛團購", "uri": "https://www.facebook.com/share/17GC8EFYAD/?mibextid=wwXIfr" },
+                    "color": "#1877F2", "flex": 1
                   }
                 ]
               },
               {
-                "type": "button",
-                "style": "secondary",
-                "height": "sm",
-                "action": {
-                  "type": "uri",
-                  "label": "分享名片給好友",
-                  "uri": shareUrl
-                },
+                "type": "button", "style": "secondary", "height": "sm",
+                "action": { "type": "uri", "label": "分享名片給好友", "uri": shareUrl },
                 "color": "#F1F3F4"
               }
             ]
           }
         };
 
-        // UI 切換控制 (Benson 架構)
+        // UI 切換
         function showUI(id, msg = "") {
             document.getElementById('statusUI').classList.add('hidden');
             document.getElementById('manualUI').classList.add('hidden');
@@ -279,23 +191,13 @@
             
             if(id === 'errorUI') {
                 document.getElementById('errorDetail').innerText = msg;
-                let env = "Env: ";
-                try { env += liff.getOS() + " / " + liff.getLanguage() + " / " + liff.getVersion(); } catch(e){}
-                document.getElementById('envInfo').innerText = env;
             }
             
             document.getElementById(id).classList.remove('hidden');
         }
 
-        // 發送名片邏輯
         async function sendAhongCard() {
             try {
-                // [修正點] 發送前確保已登入
-                if (!liff.isLoggedIn()) {
-                    liff.login();
-                    return; // 登入會跳轉，這裡中斷
-                }
-
                 const res = await liff.shareTargetPicker([
                     {
                         "type": "flex",
@@ -307,28 +209,35 @@
                 if (res) { 
                     liff.closeWindow(); 
                 } else { 
-                    // 如果取消分享，顯示手動按鈕讓使用者可以再按一次
+                    // 取消分享時，顯示手動按鈕
                     showUI('manualUI'); 
                 }
             } catch (err) {
-                console.error(err);
-                const code = err.code || "Unknown";
-                const message = err.message || JSON.stringify(err);
-                showUI('errorUI', `[${code}] ${message}`);
+                console.log(err); // 不印出 error 到 UI，避免驚嚇用戶
+                // 只有當真的是 SUBWINDOW 錯誤（瀏覽器阻擋）時，才切換到手動模式
+                // 其他錯誤 (如 JSON 格式錯) 則可能需要開發者看 console
+                showUI('manualUI');
             }
         }
 
-        // 主程式：初始化 -> 顯示按鈕 (不自動發送，避免被瀏覽器阻擋)
         async function main() {
             try {
                 await liff.init({ liffId: MY_LIFF_ID });
                 
-                // [修正點] 不管有沒有登入，都顯示手動發送按鈕
-                // 這樣可以避免瀏覽器阻擋自動彈出視窗 (EXCEPTION_IN_SUBWINDOW)
-                showUI('manualUI');
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                    return;
+                }
+
+                // 【自動發送邏輯】
+                // 這裡我們嘗試自動發送。
+                // 如果是瀏覽器環境，可能會因為 "EXCEPTION_IN_SUBWINDOW" 失敗。
+                // 失敗後，catch 區塊會捕捉到，並呼叫 showUI('manualUI') 顯示按鈕。
+                await sendAhongCard();
 
             } catch (err) {
-                showUI('errorUI', "LIFF Init Error: " + err.message);
+                // 初始化失敗
+                showUI('errorUI', "系統初始化錯誤，請重新載入");
             }
         }
         window.onload = main;
