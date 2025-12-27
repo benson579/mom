@@ -215,7 +215,7 @@
                 })
                 .catch((err) => {
                     console.error("LIFF 初始化失敗:", err);
-                    alert("LIFF 初始化失敗，請檢查 ID 是否正確");
+                    alert("LIFF 初始化失敗，請檢查 ID 是否正確，或確認網址是否已在 LINE Developers 登記為 Endpoint URL。");
                     loading.style.opacity = 0;
                     setTimeout(()=>loading.remove(), 500);
                 });
@@ -223,12 +223,19 @@
 
         // 發送名片函式
         async function sendShare() {
-            // 檢查是否在真實 LIFF 環境
-            if (!YOUR_LIFF_ID || !liff.isInClient()) {
-                alert("【預覽模式模擬】\n這將在 LINE 中開啟好友選單。\n請在程式碼填入您的 LIFF ID 以啟用功能！");
+            // 1. 檢查是否有填寫 ID (基本的 ID 檢查)
+            if (!YOUR_LIFF_ID) {
+                alert("【設定錯誤】\n請在程式碼中填入您的 LIFF ID！");
                 return;
             }
 
+            // 2. 檢查是否登入 (外部瀏覽器需要登入)
+            if (!liff.isLoggedIn()) {
+                liff.login(); // 會導向 LINE 登入頁面
+                return;
+            }
+
+            // 3. 檢查環境是否支援分享
             if (liff.isApiAvailable('shareTargetPicker')) {
                 try {
                     const res = await liff.shareTargetPicker([
@@ -240,12 +247,17 @@
                     ]);
                     if (res) {
                         alert("名片已成功分享！");
+                    } else {
+                        // 使用者取消分享，不做動作或提示
+                        console.log("分享已取消");
                     }
                 } catch (error) {
                     console.log('分享失敗或取消', error);
+                    // 不彈出 alert 避免干擾，除非是系統錯誤
                 }
             } else {
-                alert("您的 LINE 版本不支援此分享功能，請更新 LINE。");
+                // 不支援的情況 (通常是電腦版瀏覽器某些模式，或 LINE 版本過舊)
+                alert("此裝置或瀏覽器不支援「直接分享」功能。\n\n請嘗試：\n1. 將此網頁連結複製傳送到 LINE 聊天室中開啟。\n2. 或是使用手機版 LINE 開啟此連結。");
             }
         }
     </script>
