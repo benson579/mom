@@ -11,38 +11,30 @@
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #f0f2f5; color: #2c3e50; }
         .brand-bg { background: linear-gradient(135deg, #2c3e50 0%, #3498DB 100%); }
     </style>
-    <!-- 錯誤攔截器 -->
-    <script>
-        window.onerror = function(message, source, lineno, colno, error) {
-            const errorDiv = document.getElementById('debugInfo');
-            if (errorDiv) {
-                errorDiv.style.display = 'block';
-                errorDiv.innerText = "錯誤: " + message;
-            }
-            console.error(message, error);
-        };
-    </script>
 </head>
 <body class="min-h-screen flex items-center justify-center p-6 text-center">
 
     <div class="max-w-xs w-full">
+        <!-- 狀態顯示區 -->
         <div id="statusUI">
             <div class="w-12 h-12 border-4 border-[#3498DB] border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
             <h1 class="text-xl font-bold mb-2 tracking-wide">名片準備中</h1>
             <p id="statusDesc" class="text-gray-500 text-sm">正在喚醒阿虹的名片...</p>
         </div>
 
+        <!-- 手動發送區 -->
         <div id="manualUI" class="hidden">
             <div class="w-16 h-16 brand-bg rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-2xl text-white">
                 <i class="fas fa-paper-plane text-2xl"></i>
             </div>
             <h1 class="text-xl font-bold mb-2">準備完成</h1>
-            <p class="text-gray-500 text-xs mb-8">自動開啟已攔截，請點擊按鈕發送</p>
+            <p class="text-gray-500 text-xs mb-8">請點擊下方按鈕發送名片</p>
             <button onclick="sendAhongCard()" class="w-full py-4 brand-bg text-white rounded-2xl font-black text-lg active:scale-95 transition-all shadow-lg hover:shadow-blue-900/20">
                 發送名片
             </button>
         </div>
 
+        <!-- 錯誤顯示區 -->
         <div id="errorUI" class="hidden">
             <div class="bg-red-500/10 border border-red-500/50 p-6 rounded-3xl text-left">
                 <h1 class="text-red-500 font-bold mb-2 text-center">發生錯誤</h1>
@@ -50,16 +42,14 @@
                 <button onclick="window.location.reload()" class="w-full mt-4 py-2 bg-gray-200 rounded text-xs uppercase hover:bg-gray-300 font-bold text-gray-600">重新載入</button>
             </div>
         </div>
-        
-        <div id="debugInfo" style="display:none; position:fixed; bottom:0; left:0; width:100%; background:rgba(0,0,0,0.8); color:red; font-size:10px; padding:5px; z-index:99;"></div>
     </div>
 
     <script>
         const MY_LIFF_ID = "2008788337-c00C9UGS"; 
         const shareUrl = "https://liff.line.me/" + MY_LIFF_ID;
 
-        // 【最終修復】JSON 結構潔淨化
-        // 移除所有 LINE 不支援的屬性 (shadow, offsetTop)，確保 100% 合規
+        // 【安全重構版 JSON】
+        // 移除了所有 absolute positioning，改用最穩定的 Vertical 排版
         const ahongJson = {
           "type": "bubble",
           "hero": {
@@ -74,20 +64,19 @@
             "type": "box",
             "layout": "vertical",
             "contents": [
-              // 標題 (移除了 shadow 屬性)
+              // 1. 主標題 (安全寫法：直接放在 body 第一行)
               {
-                "type": "text", "text": "佳士多旅遊總監", "weight": "bold", "size": "xl", "color": "#ffffff",
-                "position": "absolute", "offsetBottom": "15px", "offsetLeft": "15px"
+                "type": "text", "text": "佳士多旅遊總監", "weight": "bold", "size": "xl", "color": "#2c3e50"
               },
+              // 2. 副標題
               {
-                "type": "text", "text": "帶您看見世界的美", "size": "xs", "color": "#ffffffcc",
-                "position": "absolute", "offsetBottom": "40px", "offsetLeft": "15px"
+                "type": "text", "text": "帶您看見世界的美", "size": "xs", "color": "#888888", "margin": "sm"
               },
-              // 標題與標籤
+              // 3. 標籤列
               {
                 "type": "box", "layout": "horizontal", "margin": "md", "alignItems": "center",
                 "contents": [
-                  { "type": "text", "text": "全方位旅遊 x 生活選物", "weight": "bold", "size": "md", "color": "#2c3e50", "flex": 1 },
+                  { "type": "text", "text": "全方位旅遊 x 生活選物", "weight": "bold", "size": "sm", "color": "#3498DB", "flex": 1 },
                   {
                     "type": "box", "layout": "vertical", "flex": 0, "backgroundColor": "#FFF0E0", "cornerRadius": "sm", "paddingAll": "xs",
                     "contents": [
@@ -96,14 +85,14 @@
                   }
                 ]
               },
-              { "type": "text", "text": "整合三大旅行社資源，為您打造最完美的旅程。懂玩、懂吃、懂生活。", "size": "xs", "color": "#555555", "wrap": true, "margin": "md" },
+              // 4. 分隔線
               { "type": "separator", "margin": "lg" },
               
-              // 列表區塊
+              // 5. 列表區塊 (安全寫法：horizontal + alignItems: center)
               {
-                "type": "box", "layout": "vertical", "margin": "lg", "spacing": "md",
+                "type": "box", "layout": "vertical", "margin": "lg", "spacing": "sm",
                 "contents": [
-                  // 第一項 (移除了 offsetTop，改用 padding 或 margin 調整)
+                  // 第一項
                   {
                     "type": "box", "layout": "horizontal", "spacing": "md", "alignItems": "center",
                     "contents": [
@@ -112,38 +101,35 @@
                         "type": "box", "layout": "vertical", "flex": 1,
                         "contents": [
                           { "type": "text", "text": "專業職人", "size": "xxs", "color": "#aaaaaa", "weight": "bold" },
-                          { "type": "text", "text": "佳士多旅行社 業務總監", "size": "sm", "color": "#2c3e50", "weight": "bold", "wrap": true },
-                          { "type": "text", "text": "山富旅行社 資深領隊導遊", "size": "xs", "color": "#666666", "wrap": true }
+                          { "type": "text", "text": "佳士多旅行社 業務總監", "size": "sm", "color": "#2c3e50", "weight": "bold", "wrap": true }
                         ]
                       }
                     ]
                   },
                   // 第二項
                   {
-                    "type": "box", "layout": "horizontal", "spacing": "md", "alignItems": "center",
+                    "type": "box", "layout": "horizontal", "spacing": "md", "alignItems": "center", "margin": "sm",
                     "contents": [
                       { "type": "icon", "url": "https://cdn-icons-png.flaticon.com/512/1256/1256650.png", "size": "sm" },
                       {
                         "type": "box", "layout": "vertical", "flex": 1,
                         "contents": [
                           { "type": "text", "text": "在地深耕", "size": "xxs", "color": "#aaaaaa", "weight": "bold" },
-                          { "type": "text", "text": "愛旅遊 中部合作夥伴", "size": "sm", "color": "#2c3e50", "weight": "bold", "wrap": true },
-                          { "type": "text", "text": "客製化行程規劃專家", "size": "xs", "color": "#666666", "wrap": true }
+                          { "type": "text", "text": "愛旅遊 中部合作夥伴", "size": "sm", "color": "#2c3e50", "weight": "bold", "wrap": true }
                         ]
                       }
                     ]
                   },
                   // 第三項
                   {
-                    "type": "box", "layout": "horizontal", "spacing": "md", "alignItems": "center",
+                    "type": "box", "layout": "horizontal", "spacing": "md", "alignItems": "center", "margin": "sm",
                     "contents": [
                       { "type": "icon", "url": "https://cdn-icons-png.flaticon.com/512/2921/2921226.png", "size": "sm" },
                       {
                         "type": "box", "layout": "vertical", "flex": 1,
                         "contents": [
                           { "type": "text", "text": "生活風格", "size": "xxs", "color": "#aaaaaa", "weight": "bold" },
-                          { "type": "text", "text": "百萬團購主 (FB社團)", "size": "sm", "color": "#E74C3C", "weight": "bold", "wrap": true },
-                          { "type": "text", "text": "分享旅行與生活中的美好事物", "size": "xs", "color": "#666666", "wrap": true }
+                          { "type": "text", "text": "百萬團購主 (FB社團)", "size": "sm", "color": "#E74C3C", "weight": "bold", "wrap": true }
                         ]
                       }
                     ]
@@ -191,6 +177,12 @@
 
         async function sendAhongCard() {
             try {
+                // 檢查是否登入
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                    return;
+                }
+
                 const res = await liff.shareTargetPicker([
                     {
                         "type": "flex",
@@ -205,8 +197,11 @@
                     showUI('manualUI'); 
                 }
             } catch (err) {
-                console.log(err); 
-                showUI('manualUI');
+                // 如果發生錯誤，顯示詳細資訊在畫面上
+                console.error(err);
+                const code = err.code || "Unknown Error";
+                const message = err.message || JSON.stringify(err);
+                showUI('errorUI', `[${code}] ${message}\n\n請截圖此畫面回報。`);
             }
         }
 
@@ -214,14 +209,11 @@
             try {
                 await liff.init({ liffId: MY_LIFF_ID });
                 
-                if (!liff.isLoggedIn()) {
-                    liff.login();
-                    return;
-                }
-                await sendAhongCard();
+                // 不自動執行，顯示手動按鈕，避免瀏覽器阻擋
+                showUI('manualUI');
 
             } catch (err) {
-                showUI('errorUI', "系統初始化錯誤，請重新載入");
+                showUI('errorUI', "系統初始化錯誤 (LIFF ID Error): " + err.message);
             }
         }
         window.onload = main;
