@@ -71,8 +71,7 @@
             <div class="p-4">
                 <!-- 1. 名字 (最上面) -->
                 <h2 class="text-[#2c3e50] font-bold text-xl leading-tight">傅虹 FU HONG</h2>
-                <!-- 2. 副標 (已移動 百萬團購主) -->
-                <p class="text-[#888888] text-xs mt-1">帶您看見世界的美 ｜ 百萬團購主 (FB社團)</p>
+                <!-- 已刪除副標題 -->
                 
                 <!-- 3. 標籤列 -->
                 <div class="flex items-center gap-2 mt-3">
@@ -129,14 +128,12 @@
             "type": "box",
             "layout": "vertical",
             "contents": [
-              // 1. 主標題：改成名字 (最上面)
+              // 1. 主標題：名字 (最上面)
               {
                 "type": "text", "text": "傅虹 FU HONG", "weight": "bold", "size": "xl", "color": "#2c3e50"
               },
-              // 2. 副標題 (已合併團購資訊)
-              {
-                "type": "text", "text": "帶您看見世界的美 ｜ 百萬團購主 (FB社團)", "size": "xs", "color": "#888888", "margin": "sm", "wrap": true
-              },
+              // 2. 已刪除副標題 (帶您看見世界的美...)
+              
               // 3. 標籤與資歷
               {
                 "type": "box", "layout": "horizontal", "margin": "md", "alignItems": "center",
@@ -199,7 +196,7 @@
                       }
                     ]
                   },
-                  // 第四項：團購 (這邊可以選擇保留或移除，因為已經移到上面了。如果需要更精簡，這裡可以移除。目前先保留作為詳細資訊)
+                  // 第四項：團購 (已修改：上方為FB社團，下方改為粗體百萬團購主)
                   {
                     "type": "box", "layout": "horizontal", "spacing": "md", "alignItems": "center", "margin": "sm",
                     "contents": [
@@ -208,7 +205,8 @@
                         "type": "box", "layout": "vertical", "flex": 1,
                         "contents": [
                           { "type": "text", "text": "生活選物", "size": "xxs", "color": "#aaaaaa", "weight": "bold" },
-                          { "type": "text", "text": "分享旅行與生活中的美好事物", "size": "sm", "color": "#999999", "weight": "bold", "wrap": true }
+                          { "type": "text", "text": "FB社團", "size": "sm", "color": "#555555", "weight": "bold", "wrap": true },
+                          { "type": "text", "text": "百萬團購主", "size": "sm", "color": "#2c3e50", "weight": "bold", "wrap": true }
                         ]
                       }
                     ]
