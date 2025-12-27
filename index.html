@@ -32,9 +32,9 @@
         </div>
     </div>
 
-    <!-- 提示訊息 (僅在非 LINE 環境顯示) -->
+    <!-- 提示訊息 -->
     <div id="external-browser-warning" class="hidden fixed top-0 left-0 w-full bg-yellow-500 text-white text-center text-xs py-2 z-50">
-        建議將連結複製到 LINE 聊天室中開啟，體驗最佳分享功能。
+        請在 LINE 聊天室中開啟此連結，以使用分享功能。
     </div>
 
     <div class="relative w-full max-w-[375px] h-full sm:h-[750px] bg-[#9bb0be] sm:rounded-[3rem] sm:border-8 sm:border-gray-800 overflow-hidden flex flex-col shadow-2xl">
@@ -77,21 +77,24 @@
                 <div class="p-4 pt-0 grid grid-cols-2 gap-2">
                     <a href="https://line.me/ti/p/FaXuuoOYal" class="col-span-1 bg-[#06C755] hover:opacity-90 text-white font-bold py-2.5 rounded-lg text-xs flex items-center justify-center gap-1 shadow-sm no-underline"><i class="fab fa-line"></i> 諮詢行程</a>
                     <a href="https://www.facebook.com/share/17GC8EFYAD/?mibextid=wwXIfr" class="col-span-1 bg-[#1877F2] hover:opacity-90 text-white font-bold py-2.5 rounded-lg text-xs flex items-center justify-center gap-1 shadow-sm no-underline"><i class="fab fa-facebook-f"></i> 逛逛團購</a>
-                    <!-- 分享按鈕 -->
+                    <!-- 發送按鈕 -->
                     <button id="btnShare" onclick="sendShare()" class="col-span-2 bg-gray-800 text-white font-bold py-3 rounded-lg text-sm hover:bg-black flex items-center justify-center gap-2 mt-2 shadow-md transition transform active:scale-95"><i class="fas fa-paper-plane"></i> 分享名片給好友</button>
                 </div>
             </div>
             
              <p class="text-white text-xs opacity-70 mt-4 text-center px-4">
-                若朋友收到空白訊息，請確保您是在 LINE 應用程式中開啟此頁面。
+                點擊上方黑色按鈕，將名片發送給您的 LINE 好友。
             </p>
         </div>
     </div>
 
     <script>
         const YOUR_LIFF_ID = "2008788337-c00C9UGS"; 
+        
+        // 這是按鈕按下去後，會連結到的網址 (就是這個 LIFF 發射器本身)
+        const shareUrl = "https://liff.line.me/" + YOUR_LIFF_ID;
 
-        // 這是已經修正過語法的 Flex Message JSON
+        // Flex Message 設定
         const flexMessage = {
             "type": "bubble",
             "hero": {
@@ -108,7 +111,8 @@
                     { "type": "text", "text": "佳士多旅遊總監", "weight": "bold", "size": "xl", "color": "#ffffff", "position": "absolute", "offsetBottom": "15px", "offsetLeft": "15px", "shadow": true },
                     { "type": "text", "text": "帶您看見世界的美", "size": "xs", "color": "#ffffffcc", "position": "absolute", "offsetBottom": "40px", "offsetLeft": "15px" },
                     {
-                        "type": "box", "layout": "baseline", "margin": "md",
+                        // 修正重點：改用 horizontal 並加上 alignItems: center，這才是 LINE 認可的合法結構
+                        "type": "box", "layout": "horizontal", "margin": "md", "alignItems": "center",
                         "contents": [
                             { "type": "text", "text": "全方位旅遊 x 生活選物", "weight": "bold", "size": "md", "color": "#2c3e50", "flex": 1 },
                             {
@@ -141,7 +145,8 @@
                             { "type": "button", "style": "primary", "height": "sm", "action": { "type": "uri", "label": "逛逛團購", "uri": "https://www.facebook.com/share/17GC8EFYAD/?mibextid=wwXIfr" }, "color": "#1877F2", "flex": 1 }
                         ]
                     },
-                    { "type": "button", "style": "secondary", "height": "sm", "action": { "type": "uri", "label": "分享名片給好友", "uri": "https://line.me/R/nv/recommendOA/@LineID" }, "color": "#F1F3F4" }
+                    /* 這裡連結回 LIFF，形成閉環 */
+                    { "type": "button", "style": "secondary", "height": "sm", "action": { "type": "uri", "label": "分享名片給好友", "uri": shareUrl }, "color": "#F1F3F4" }
                 ]
             }
         };
@@ -149,13 +154,11 @@
         window.onload = function() {
             const loading = document.getElementById('loading');
             
-            // 初始化 LIFF
             if (YOUR_LIFF_ID) {
                 liff.init({ liffId: YOUR_LIFF_ID }).then(() => {
                     loading.style.opacity = 0;
                     setTimeout(()=>loading.remove(), 500);
 
-                    // 檢測是否在外部瀏覽器
                     if (!liff.isInClient()) {
                         document.getElementById('external-browser-warning').classList.remove('hidden');
                     }
@@ -173,7 +176,6 @@
         async function sendShare() {
             // 1. 如果是在 LINE 外部 (Chrome/Safari)
             if (!liff.isInClient()) {
-                // 嘗試直接呼叫 LINE App 開啟此頁面 (Deep Link)
                 const lineAppUrl = "https://line.me/R/app/" + YOUR_LIFF_ID;
                 if (confirm("此功能需要在 LINE App 中執行。\n\n是否嘗試開啟 LINE？")) {
                     window.location.href = lineAppUrl;
@@ -193,10 +195,13 @@
                     ]);
                     if (res) {
                         alert("名片發送成功！");
-                        liff.closeWindow(); // 發送完自動關閉視窗
+                        liff.closeWindow(); 
+                    } else {
+                        // 使用者取消分享
                     }
                 } catch (error) {
                     console.log('分享失敗', error);
+                    alert("分享發生錯誤：" + error + "\n請確認圖片連結是否正常");
                 }
             } else {
                 alert("您的 LINE 版本過舊，不支援此分享功能。");
