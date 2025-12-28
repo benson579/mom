@@ -61,7 +61,7 @@
             </div>
         </div>
         
-        <!-- 預覽區 (讓您在網頁上也能看到即將發送的樣子) -->
+        <!-- 預覽區 -->
         <div class="mt-8 bg-white rounded-xl overflow-hidden w-full max-w-[300px] mx-auto text-left shadow-lg">
             <!-- 圖片 -->
             <div class="relative w-full h-44">
@@ -69,10 +69,8 @@
             </div>
             <!-- 內容 -->
             <div class="p-4">
-                <!-- 1. 名字 (最上面) -->
                 <h2 class="text-[#2c3e50] font-bold text-xl leading-tight">傅虹 FU HONG</h2>
                 
-                <!-- 3. 標籤列 -->
                 <div class="flex items-center gap-2 mt-3">
                     <span class="text-[#3498DB] font-bold text-sm flex-1">全方位旅遊 x 生活選物</span>
                     <span class="bg-[#FFF0E0] text-[#E67E22] text-[10px] font-bold px-2 py-1 rounded">20年資歷</span>
@@ -80,41 +78,24 @@
 
                 <div class="w-full border-t border-gray-100 my-3"></div>
 
-                <!-- 4. 列表 -->
-                <div class="space-y-2 text-xs">
-                    <div class="flex items-center gap-2">
-                        <span>✈️</span>
-                        <div>
-                            <p class="text-[#aaaaaa] font-bold">佳士多旅行社</p>
-                            <p class="text-[#2c3e50] font-bold">業務總監</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span>🚩</span>
-                        <div>
-                            <p class="text-[#aaaaaa] font-bold">山富旅行社</p>
-                            <p class="text-[#2c3e50] font-bold">資深領隊導遊</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span>🤝</span>
-                        <div>
-                            <p class="text-[#aaaaaa] font-bold">愛旅遊 (中部夥伴)</p>
-                            <p class="text-[#2c3e50] font-bold">客製化行程規劃專家</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span>🛍️</span>
-                        <div>
-                            <p class="text-[#aaaaaa] font-bold">生活選物</p>
-                            <p class="text-[#2c3e50] font-bold">百萬團購主</p>
-                        </div>
-                    </div>
+                <!-- 列表省略 -->
+                <div class="space-y-2 text-xs mb-4">
+                    <div class="flex items-center gap-2"><span>✈️</span><p class="text-[#2c3e50] font-bold">佳士多旅行社</p></div>
+                    <div class="flex items-center gap-2"><span>🚩</span><p class="text-[#2c3e50] font-bold">山富旅行社</p></div>
+                </div>
+
+                <!-- 按鈕預覽 -->
+                <div class="grid grid-cols-2 gap-2">
+                    <a href="#" class="col-span-1 bg-[#06C755] text-white font-bold py-2 rounded text-xs text-center">諮詢行程</a>
+                    <a href="#" class="col-span-1 bg-[#1877F2] text-white font-bold py-2 rounded text-xs text-center">逛逛團購</a>
+                    <!-- 修正：移除電話號碼，只留文字 -->
+                    <a href="tel:0975373007" class="col-span-2 bg-[#2c3e50] text-white font-bold py-2 rounded text-xs text-center">📞 直接聯繫我</a>
+                    <!-- 分享按鈕 -->
+                    <a href="#" class="col-span-2 bg-[#F1F3F4] text-gray-500 font-bold py-2 rounded text-xs text-center">分享名片給好友</a>
                 </div>
             </div>
-            <!-- 預覽底部提示 -->
             <div class="bg-gray-50 p-2 text-center text-[10px] text-gray-400">
-                (預覽畫面：實際發送為 Flex Message)
+                (預覽畫面)
             </div>
         </div>
         
@@ -140,7 +121,7 @@
             "type": "box",
             "layout": "vertical",
             "contents": [
-              // 1. 主標題：名字 (最上面)
+              // 1. 主標題
               {
                 "type": "text", "text": "傅虹 FU HONG", "weight": "bold", "size": "xl", "color": "#2c3e50"
               },
@@ -207,7 +188,7 @@
                       }
                     ]
                   },
-                  // 第四項：團購 (已移除FB社團)
+                  // 第四項：團購
                   {
                     "type": "box", "layout": "horizontal", "spacing": "md", "alignItems": "center", "margin": "sm",
                     "contents": [
@@ -238,10 +219,16 @@
                   },
                   {
                     "type": "button", "style": "primary", "height": "sm",
-                    "action": { "type": "uri", "label": "逛逛團購", "uri": "https://www.facebook.com/share/17GC8EFYAD/?mibextid=wwXIfr" },
+                    "action": { "type": "uri", "label": "逛逛團購", "uri": "https://www.facebook.com/share/g/1HAzjYUzNg/?mibextid=wwXIfr" },
                     "color": "#1877F2", "flex": 1
                   }
                 ]
+              },
+              // 修正：這裡的文字已經簡化為 "直接聯繫我"
+              {
+                "type": "button", "style": "primary", "height": "sm",
+                "action": { "type": "uri", "label": "📞 直接聯繫我", "uri": "tel:0975373007" },
+                "color": "#2c3e50"
               },
               {
                 "type": "button", "style": "secondary", "height": "sm",
@@ -276,7 +263,7 @@
                 const res = await liff.shareTargetPicker([
                     {
                         "type": "flex",
-                        "altText": "這是阿虹的專屬名片，推薦給您！", // 更新了這裡的文字
+                        "altText": "這是阿虹的專屬名片，推薦給您！",
                         "contents": ahongJson
                     }
                 ]);
